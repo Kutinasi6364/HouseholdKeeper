@@ -1,0 +1,103 @@
+<!-- 取引修正用モーダル -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">取引の編集</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'ledger_update' %}">
+                    {% csrf_token %}
+                    <div class="mb-3" style="display: none;">
+                        <label for="modalId" class="form-label">ID</label>
+                        <input type="text" id="modalId" name="id" class="form-control" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <div class="mb-3 d-flex align-items-center justify-content-between">
+                            <label for="category" class="form-label mb-0">カテゴリ</label>
+                        </div>
+                        <select id="modalCategory" name="category" class="form-control" required>
+                            <option value="">カテゴリを選択</option>
+                            {% for category in categories %}
+                                <option value="{{ category.name }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalName" class="form-label">名前</label>
+                        <input type="text" id="modalName" name="name" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalAmount" class="form-label">金額</label>
+                        <input type="number" id="modalAmount" name="amount" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalDate" class="form-label">取引日</label>
+                        <input type="date" id="modalDate" name="date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalAmount" class="form-label">取引種別</label>
+                        <select id="modalTransaction_type" name="transaction_type" class="form-select" required>
+                            <option value="income">収入</option>
+                            <option value="expense">支出</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="submit" class="btn btn-primary">更新</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- カテゴリ追加モーダル -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'category_register' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">カテゴリを追加</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="new_category" class="form-label">カテゴリ名</label>
+                        <input type="text" id="new_category" name="category" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="submit" class="btn btn-success">追加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 削除確認モーダル -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'ledger_delete' %}">
+                {% csrf_token %}
+                <div class="mb-3" style="display: none;">
+                    <label for="modalId" class="form-label">ID</label>
+                    <input type="text" id="modalId" name="id" class="form-control" readonly>
+                </div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">削除の確認</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    本当に削除しますか？この操作は元に戻せません。
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="submit" class="btn btn-danger" id="deleteButton">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

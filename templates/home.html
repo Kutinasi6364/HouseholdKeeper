@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+<div class="h-100 container-fluid">
+    <div class="h-100 mt-3 row">
+        <div class="row" style="font-size: 0.8em;">
+            <!-- Summary -->
+            <div class="col-7 ms-0">
+                <h5 class="text-start">{{ year }}年 {{ month }}月 の収支</h5>
+                <div class="row">
+                    <div class="card mb-2">
+                        <div class="card-body row">
+                            <h4 class="card-text fs-6">収入:  {{ income | intcomma }}円</h4>
+                        </div>
+                    </div>
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h4 class="card-text fs-6">支出: {{ expense | intcomma }}円</h4>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="text-center">カテゴリー別割合</h4>
+            
+                <div class="row">
+                    <!-- 収入の円グラフ -->
+                    <div class="col-md-6">
+                        <h5 class="text-center">収入の割合</h5>
+                        <canvas id="incomePieChart"></canvas>
+                        <div id="incomeChartContainer"></div>
+                    </div>
+                    <script id="incomeData" type="application/json">
+                        {{ income_category_data | safe }}
+                    </script>
+            
+                    <!-- 支出の円グラフ -->
+                    <div class="col-md-6">
+                        <h5 class="text-center">支出の割合</h5>
+                        <canvas id="expensePieChart"></canvas>
+                        <div id="expenseChartContainer"></div>
+                    </div>
+                    <script id="expenseData" type="application/json">
+                        {{ expense_category_data | safe }}
+                    </script>
+                </div>
+            </div>
+        
+            <!-- 取引入力 -->
+            <div class="col-5 bg-light border-end">
+                <h5 class="text-center mt-3">取引入力</h5>
+                <form method="post" action="{% url 'ledger_register' %}" class="p-3">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <div class="mb-3 d-flex align-items-center justify-content-between">
+                            <label for="category" class="form-label mb-0">カテゴリ</label>
+                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">追加</button>
+                        </div>
+                        <select id="category" name="category" class="form-control form-select-sm" required>
+                            <option value="">カテゴリを選択</option>
+                            {% for category in categories %}
+                                <option value="{{ category.name }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">取引名</label>
+                        <input type="text" id="name" name="name" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">取引金額</label>
+                        <input type="number" id="amount" name="amount" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">取引日</label>
+                        <input type="date" id="date" name="date" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="transaction_type" class="form-label">取引種別</label>
+                        <select id="transaction_type" name="transaction_type" class="form-select form-select-sm" required>
+                            <option value="income">収入</option>
+                            <option value="expense">支出</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm w-100">追加</button>
+                </form>
+            </div>
+
+            <div class="col-12">
+                <h4 class="text-left mt-3">取引履歴</h4>
+                {% for transaction in transactions %}
+                    <ul class="list-group">
+                        <li class="list-group-item col">カテゴリ:  {{ transaction.category }}</li>
+                        <li class="list-group-item col">取引名:  {{ transaction.name }}</li>
+                        <li class="list-group-item col">取引額:  ￥{{ transaction.amount|intcomma }}</li>
+                        <li class="list-group-item col">取引日:  {{ transaction.date|date:"Y-m-d" }}</li>
+                        <li class="list-group-item col">取引種別:  {{ transaction.transaction_type }}</li>
+                    </ul>
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-primary btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                data-id="{{ transaction.id }}" 
+                                data-category="{{ transaction.category }}"
+                                data-name="{{ transaction.name }}" 
+                                data-amount="{{ ledtransactionger.amount }}"
+                                data-date="{{ transaction.date|date:"Y-m-d" }}"
+                                data-transaction_type="{{ transaction.transaction_type }}">
+                                編集
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm delete-btn ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                data-id="{{ transaction.id }}">削除
+                        </button>
+                    </div>
+                {% endfor %}
+                {% if not ledtransactionsgers %}
+                    <div class="text-center" style="font-size: 2em; font-weight: bold;">
+                        There are no ledgers.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% include 'modals.html' %}
+
+    </div>
+</div>
+{% endblock %}
