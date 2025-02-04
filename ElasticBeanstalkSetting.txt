@@ -1,0 +1,18 @@
+pip install awsbcli gunicorn
+
+settings.py
+import os
+ALLOWSED_HOSTS = ['.elasticbeanstalk.com']
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+
+pip freeze > requirements.txt
+
+# awsセッティング
+aws configure
+
+# Elastic Beanstalkの初期化
+eb init -p python-3.11 HouseholdKeeper --region ap-northeast-1
+
+# Elastic Beanstalkの環境変数
+eb setenv DJANGO_SETTINGS_MODULE=HouseholdKeeper.settings
